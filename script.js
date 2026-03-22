@@ -1,4 +1,3 @@
-//your JS code here. If required.
 let player1 = "";
 let player2 = "";
 let currentPlayer = "X";
@@ -10,42 +9,54 @@ const submitBtn = document.getElementById("submit");
 const message = document.querySelector(".message");
 const cells = document.querySelectorAll(".cell");
 
-submitBtn.addEventListener("click", () => {
+// Submit button
+submitBtn.addEventListener("click", function () {
     player1 = document.getElementById("player-1").value;
     player2 = document.getElementById("player-2").value;
-
-    if (player1 === "" || player2 === "") {
-        alert("Please enter both player names");
-        return;
-    }
 
     document.getElementById("input-section").style.display = "none";
     document.getElementById("game-section").style.display = "block";
 
-    message.innerText = `${player1}, you're up`;
+    // IMPORTANT: exact format
+    message.innerText = player1 + ", you're up";
 });
 
+// Cell click
 cells.forEach((cell, index) => {
-    cell.addEventListener("click", () => {
+    cell.addEventListener("click", function () {
+
         if (board[index] !== "" || !gameActive) return;
 
-        board[index] = currentPlayer;
-        cell.innerText = currentPlayer.toLowerCase();
+        if (currentPlayer === "X") {
+            cell.innerText = "x";   // MUST be lowercase
+            board[index] = "X";
+        } else {
+            cell.innerText = "o";   // MUST be lowercase
+            board[index] = "O";
+        }
 
+        // Check winner
         if (checkWinner()) {
             gameActive = false;
-            let winnerName = currentPlayer === "X" ? player1 : player2;
-            message.innerText = `${winnerName} congratulations you won!`;
+
+            let winner = currentPlayer === "X" ? player1 : player2;
+
+            // IMPORTANT: exact string format
+            message.innerText = winner + " congratulations you won!";
             return;
         }
 
+        // Switch player
         currentPlayer = currentPlayer === "X" ? "O" : "X";
 
-        let nextPlayer = currentPlayer === "X" ? player1 : player2;
-        message.innerText = `${nextPlayer}, you're up`;
+        let next = currentPlayer === "X" ? player1 : player2;
+
+        // IMPORTANT: exact format
+        message.innerText = next + ", you're up";
     });
 });
 
+// Winner logic
 function checkWinner() {
     const winPatterns = [
         [0,1,2], [3,4,5], [6,7,8],
@@ -53,10 +64,15 @@ function checkWinner() {
         [0,4,8], [2,4,6]
     ];
 
-    return winPatterns.some(pattern => {
+    for (let pattern of winPatterns) {
         let [a, b, c] = pattern;
-        return board[a] &&
-               board[a] === board[b] &&
-               board[a] === board[c];
-    });
+
+        if (board[a] !== "" &&
+            board[a] === board[b] &&
+            board[a] === board[c]) {
+            return true;
+        }
+    }
+
+    return false;
 }
